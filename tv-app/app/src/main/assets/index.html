@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>TV Remote</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0 auto;padding:12px;max-width:480px;font-family:system-ui,sans-serif;background:#111;color:#eee}
+  h1{font-size:20px;margin:6px 0 8px}
+  #status{font-size:13px;color:#999;margin-bottom:10px;min-height:18px}
+  .row{display:flex;gap:8px;margin-bottom:10px}
+  input{flex:1;min-width:0;padding:12px;border-radius:10px;border:1px solid #333;background:#1c1c1c;color:#eee;font-size:16px}
+  button{padding:12px;border-radius:10px;border:0;background:#2a2a2a;color:#eee;font-size:15px;flex:1}
+  button:active{background:#444}
+  button:disabled{opacity:.5}
+  #pad{height:200px;border-radius:14px;background:#1c1c1c;display:flex;align-items:center;justify-content:center;
+       color:#555;touch-action:none;user-select:none;margin-bottom:12px;text-align:center;font-size:14px}
+  .dpad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+  .ok{background:#6a4cff}
+  #heard{font-size:14px;color:#aaa;min-height:20px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<h1>TV Remote</h1>
+<div id="status">Connecting…</div>
+
+<div class="row">
+  <input id="code" placeholder="Pairing code (shown on TV)" inputmode="numeric" maxlength="6">
+  <button id="saveCode">Save</button>
+</div>
+
+<div id="pad">Tap = select<br>Swipe = move / scroll</div>
+
+<div class="dpad">
+  <span></span><button data-dpad="up">▲</button><span></span>
+  <button data-dpad="left">◀</button><button data-dpad="ok" class="ok">OK</button><button data-dpad="right">▶</button>
+  <span></span><button data-dpad="down">▼</button><span></span>
+</div>
+
+<div class="grid">
+  <button data-key="back">Back</button>
+  <button data-key="home">Home</button>
+  <button data-key="recents">Recents</button>
+  <button data-vol="down">Vol −</button>
+  <button data-vol="mute">Mute</button>
+  <button data-vol="up">Vol +</button>
+</div>
+
+<div class="row">
+  <input id="text" placeholder="Type here, then Send">
+  <button id="sendText">Send</button>
+</div>
+
+<div class="row"><button id="mic">🎤 Speak</button></div>
+<div id="heard"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+let code = localStorage.getItem('tvRemoteCode') || '';
+$('#code').value = code;
+
+function setStatus(msg, ok) {
+  $('#status').textContent = msg;
+  $('#status').style.color = ok === undefined ? '#999' : ok ? '#7f7' : '#f88';
+}
+
+async function send(cmd) {
+  if (!code) { setStatus('Enter the pairing code shown on your TV', false); return false; }
+  try {
+    const r = await fetch('/api/cmd', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Pair-Code': code },
+      body: JSON.stringify(cmd)
+    });
+    if (r.status === 401) { setStatus('Wrong pairing code', false); return false; }
+    const j = await r.json().catch(() => ({}));
+    if (!j.ok) { setStatus('TV could not do that. Is accessibility on, and is a text box focused for typing?', false); return false; }
+    setStatus('Connected', true);
+    return true;
+  } catch (e) {
+    setStatus('Cannot reach the TV. Same Wi-Fi?', false);
+    return false;
+  }
+}
+
+// Initial reachability check
+fetch('/api/status').then(r => r.json()).then(j => setStatus('Found TV: ' + j.name))
+  .catch(() => setStatus('Cannot reach the TV', false));
+
+$('#saveCode').onclick = () => {
+  code = $('#code').value.trim();
+  localStorage.setItem('tvRemoteCode', code);
+  setStatus('Code saved', undefined);
+};
+
+// D-pad and OK
+document.querySelectorAll('[data-dpad]').forEach(b => {
+  b.onclick = () => send({ type: 'dpad', dir: b.dataset.dpad });
+});
+
+// Back / Home / Recents
+document.querySelectorAll('[data-key]').forEach(b => {
+  b.onclick = () => send({ type: 'key', name: b.dataset.key });
+});
+
+// Volume
+document.querySelectorAll('[data-vol]').forEach(b => {
+  b.onclick = () => send({ type: 'volume', dir: b.dataset.vol });
+});
+
+// Touchpad: a tap selects, a swipe moves focus or scrolls on the TV
+const pad = $('#pad');
+let sx = 0, sy = 0, st = 0, moved = 0;
+pad.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  sx = t.clientX; sy = t.clientY; st = Date.now(); moved = 0;
+  e.preventDefault();
+}, { passive: false });
+pad.addEventListener('touchmove', e => {
+  const t = e.touches[0];
+  moved = Math.max(moved, Math.hypot(t.clientX - sx, t.clientY - sy));
+  e.preventDefault();
+}, { passive: false });
+pad.addEventListener('touchend', e => {
+  const t = e.changedTouches[0];
+  const dx = t.clientX - sx, dy = t.clientY - sy;
+  if (moved < 10 && Date.now() - st < 400) {
+    send({ type: 'tap' });
+  } else if (Math.abs(dx) > Math.abs(dy)) {
+    send({ type: 'swipe', dir: dx > 0 ? 'right' : 'left', distance: Math.min(600, Math.abs(dx) * 3) });
+  } else {
+    send({ type: 'swipe', dir: dy > 0 ? 'down' : 'up', distance: Math.min(600, Math.abs(dy) * 3) });
+  }
+  e.preventDefault();
+}, { passive: false });
+
+// Typing: the phone text box is the source of truth; Send replaces the TV field's text
+$('#sendText').onclick = async () => {
+  const v = $('#text').value;
+  if (!v) return;
+  if (await send({ type: 'text', value: v, append: false })) $('#text').value = '';
+};
+
+// Voice input
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) {
+  $('#mic').disabled = true;
+  $('#mic').textContent = 'Voice not supported here';
+} else {
+  const rec = new SR();
+  rec.lang = 'en-US';
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  rec.onresult = e => {
+    const said = e.results[0][0].transcript.trim();
+    $('#heard').textContent = 'Heard: ' + said;
+    handleVoice(said);
+  };
+  rec.onerror = e => { $('#heard').textContent = 'Voice error: ' + e.error + ' (you can also use your keyboard mic)'; };
+  $('#mic').onclick = () => { $('#heard').textContent = 'Listening…'; rec.start(); };
+}
+
+function handleVoice(s) {
+  const t = s.toLowerCase();
+  if (t === 'back' || t === 'go back') return send({ type: 'key', name: 'back' });
+  if (t === 'home' || t === 'go home') return send({ type: 'key', name: 'home' });
+  if (t === 'recents' || t === 'recent apps') return send({ type: 'key', name: 'recents' });
+  if (t === 'volume up' || t === 'louder') return send({ type: 'volume', dir: 'up' });
+  if (t === 'volume down' || t === 'quieter') return send({ type: 'volume', dir: 'down' });
+  if (t === 'mute') return send({ type: 'volume', dir: 'mute' });
+  if (t === 'select' || t === 'ok' || t === 'click') return send({ type: 'dpad', dir: 'ok' });
+  if (t === 'scroll down') return send({ type: 'swipe', dir: 'up', distance: 500 });
+  if (t === 'scroll up') return send({ type: 'swipe', dir: 'down', distance: 500 });
+  // Anything else goes into the text box so you can check it and tap Send
+  $('#text').value = s.replace(/^(type|search for|search)\s+/i, '');
+  $('#heard').textContent += '  (put in the text box, tap Send)';
+}
+</script>
+</body>
+</html>
