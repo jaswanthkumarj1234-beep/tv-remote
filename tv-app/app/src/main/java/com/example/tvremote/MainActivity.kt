@@ -12,6 +12,7 @@ import java.util.Collections
 
 class MainActivity : Activity() {
 
+    // A fresh 6-digit pairing code is generated every time the app starts.
     private val pairCode = (100000..999999).random().toString()
     private var server: LocalServer? = null
 
@@ -20,10 +21,8 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
 
         val ip = localIp() ?: "unknown"
-        findViewById<TextView>(R.id.info).text =
-            "On your phone (same Wi-Fi), open:\nhttp://$ip:8080\n\n" +
-            "Pairing code: $pairCode\n\n" +
-            "Turn on \"TV Remote\" in Accessibility settings."
+        findViewById<TextView>(R.id.url).text = "http://$ip:8080"
+        findViewById<TextView>(R.id.code).text = pairCode
 
         findViewById<Button>(R.id.btnAccessibility).setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
