@@ -5,49 +5,49 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TV Remote - Download</title>
 <style>
-  body{font-family:system-ui,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.5;color:#222}
-  h1{margin-bottom:4px}
-  .btn{display:inline-block;padding:14px 22px;border-radius:10px;background:#6a4cff;color:#fff;text-decoration:none;font-weight:600;margin:12px 0}
-  code{background:#f2f2f2;padding:2px 6px;border-radius:6px}
-  .note{background:#fff8e1;border-left:4px solid #f0b400;padding:12px 16px;border-radius:6px}
-  li{margin-bottom:8px}
+  body{margin:0;padding:40px 6vw;background:#000;color:#fff;font-family:system-ui,Arial,sans-serif;line-height:1.5;font-size:22px}
+  h1{font-size:34px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 6px}
+  h1 span{color:#ff7a00}
+  p.sub{color:#999;margin:0 0 28px}
+  a.btn{display:block;width:100%;max-width:760px;box-sizing:border-box;text-align:center;padding:30px 20px;border-radius:16px;
+        background:#ff7a00;color:#000;font-size:34px;font-weight:800;text-decoration:none;border:6px solid #ff7a00}
+  a.btn:focus,a.btn:hover{background:#fff;border-color:#fff;outline:none}
+  .url{margin:22px 0 4px;color:#999;font-size:18px}
+  .big{font-size:26px;word-break:break-all;color:#fff}
+  .big b{color:#ff7a00}
+  h2{font-size:20px;letter-spacing:.15em;text-transform:uppercase;color:#ff7a00;margin:38px 0 10px}
+  ol{padding-left:28px;margin:0}
+  li{margin-bottom:10px}
+  .note{border-left:5px solid #ff7a00;padding:10px 18px;color:#bbb;margin-top:34px;font-size:18px}
+  a.small{color:#ff7a00}
 </style>
 </head>
 <body>
-<h1>TV Remote</h1>
-<p>Control your Android TV from your phone's browser: touchpad, text typing, volume, and voice commands.</p>
+<h1>TV <span>Remote</span></h1>
+<p class="sub">Control your Android TV from your phone.</p>
 
-<a class="btn" href="https://github.com/jaswanthkumarj1234-beep/tv-remote/releases/latest/download/tv-remote.apk">Download APK for Android TV</a>
+<a class="btn" id="dl" href="https://github.com/jaswanthkumarj1234-beep/tv-remote/releases/latest/download/tv-remote.apk" autofocus>DOWNLOAD APK</a>
+
+<p class="url">If the button does nothing, type this address into the Downloader app:</p>
+<div class="big">github.com/jaswanthkumarj1234-beep/tv-remote/<b>releases/latest/download/tv-remote.apk</b></div>
 
 <h2>Install on the TV</h2>
 <ol>
-  <li>On the TV, allow installs from unknown sources for your file manager or browser (Settings &gt; Apps &gt; Special access).</li>
-  <li>Download <code>tv-remote.apk</code> on the TV's browser, or copy it from your phone with a USB stick.</li>
-  <li>Open the file and install it.</li>
-  <li>Open <strong>TV Remote</strong> on the TV. It shows an address like <code>http://192.168.1.20:8080</code> and a 6-digit code.</li>
-  <li>Open <strong>Settings &gt; Accessibility &gt; TV Remote</strong> and turn it on. The app's own button also opens this screen.</li>
+  <li>Easiest: install the free <b>Downloader</b> app from the TV's app store, open it, type the address above and press Go.</li>
+  <li>When asked, allow <b>Install unknown apps</b> for Downloader (or your browser), then press Install.</li>
+  <li>Open <b>TV Remote</b>. The TV shows an address like http://192.168.1.20:8080 and a 6-digit code.</li>
+  <li>Press the orange button in the app to open Accessibility, then turn <b>TV Remote</b> on.</li>
 </ol>
 
-<h2>Use it from your phone</h2>
+<h2>Then on your phone</h2>
 <ol>
-  <li>Connect the phone to the same Wi-Fi as the TV.</li>
+  <li>Join the same Wi-Fi as the TV.</li>
   <li>Open the address shown on the TV in your phone's browser.</li>
-  <li>Enter the 6-digit code, then tap <strong>Save</strong>.</li>
-  <li>Use the touchpad, buttons, text box, or mic.</li>
+  <li>Enter the 6-digit code and tap Save.</li>
 </ol>
 
-<div class="note">
-  <strong>Note:</strong> This app can type into your TV and press buttons for you, so only install it on TVs you own and only pair with phones you trust. The phone controller is served by the TV itself, so it only works on your home network.
-</div>
+<div class="note">This app can type and press buttons on your TV, so only install it on TVs you own and pair only with phones you trust. It only works on your home network.</div>
 
-<h2>Known limits</h2>
-<ul>
-  <li>Typing works in apps with a focused text field.</li>
-  <li>Arrow keys are approximated with swipes, not true remote key presses.</li>
-  <li>Play and pause aren't supported. Volume is.</li>
-  <li>Voice in the browser may need the phone keyboard's mic instead.</li>
-</ul>
-
-<p><a href="https://github.com/jaswanthkumarj1234-beep/tv-remote">Source code on GitHub</a></p>
+<p style="margin-top:30px"><a class="small" href="https://github.com/jaswanthkumarj1234-beep/tv-remote">Source code on GitHub</a></p>
 </body>
 </html>
