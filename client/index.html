@@ -3,57 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="theme-color" content="#000000">
 <title>TV Remote</title>
 <style>
+  :root{--bg:#000;--fg:#fff;--dim:#777;--line:#222;--panel:#0b0b0b;--accent:#ff7a00}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0 auto;padding:12px;max-width:480px;font-family:system-ui,sans-serif;background:#111;color:#eee}
-  h1{font-size:20px;margin:6px 0 8px}
-  #status{font-size:13px;color:#999;margin-bottom:10px;min-height:18px}
-  .row{display:flex;gap:8px;margin-bottom:10px}
-  input{flex:1;min-width:0;padding:12px;border-radius:10px;border:1px solid #333;background:#1c1c1c;color:#eee;font-size:16px}
-  button{padding:12px;border-radius:10px;border:0;background:#2a2a2a;color:#eee;font-size:15px;flex:1}
-  button:active{background:#444}
-  button:disabled{opacity:.5}
-  #pad{height:200px;border-radius:14px;background:#1c1c1c;display:flex;align-items:center;justify-content:center;
-       color:#555;touch-action:none;user-select:none;margin-bottom:12px;text-align:center;font-size:14px}
-  .dpad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-  .ok{background:#6a4cff}
-  #heard{font-size:14px;color:#aaa;min-height:20px;margin-bottom:8px}
+  body{margin:0 auto;padding:18px 16px 28px;max-width:440px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg)}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  h1{font-size:15px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;margin:0}
+  h1 span{color:var(--accent)}
+  #status{font-size:12px;color:var(--dim);display:flex;align-items:center;gap:6px}
+  #status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dim)}
+  #status.ok{color:var(--fg)}
+  #status.ok::before{background:var(--accent)}
+  #status.bad{color:var(--accent)}
+  #status.bad::before{background:var(--accent)}
+  .row{display:flex;gap:8px;margin-bottom:12px}
+  input{flex:1;min-width:0;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:16px;outline:none}
+  input:focus{border-color:var(--accent)}
+  input::placeholder{color:#555}
+  button{padding:14px 10px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:14px;letter-spacing:.04em;flex:1}
+  button:active{background:var(--accent);border-color:var(--accent);color:#000}
+  button:disabled{opacity:.4}
+  #saveCode{flex:0 0 auto;padding:13px 18px}
+  #pad{height:210px;border-radius:18px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+       color:#555;touch-action:none;user-select:none;margin-bottom:14px;text-align:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;line-height:1.9}
+  #pad.on{border-color:var(--accent)}
+  .dpad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+  .dpad button{height:58px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .ok{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700}
+  .ok:active{background:#fff;border-color:#fff}
+  #heard{font-size:13px;color:var(--dim);min-height:20px;margin-top:2px}
+  .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin:6px 0 8px}
 </style>
 </head>
 <body>
-<h1>TV Remote</h1>
-<div id="status">Connecting…</div>
+<header>
+  <h1>TV <span>Remote</span></h1>
+  <div id="status">Connecting</div>
+</header>
 
+<div class="label">Pairing code</div>
 <div class="row">
-  <input id="code" placeholder="Pairing code (shown on TV)" inputmode="numeric" maxlength="6">
+  <input id="code" placeholder="6-digit code on TV" inputmode="numeric" maxlength="6">
   <button id="saveCode">Save</button>
 </div>
 
+<div class="label">Touchpad</div>
 <div id="pad">Tap = select<br>Swipe = move / scroll</div>
 
 <div class="dpad">
-  <span></span><button data-dpad="up">▲</button><span></span>
-  <button data-dpad="left">◀</button><button data-dpad="ok" class="ok">OK</button><button data-dpad="right">▶</button>
-  <span></span><button data-dpad="down">▼</button><span></span>
+  <span></span><button data-dpad="up">&#9650;</button><span></span>
+  <button data-dpad="left">&#9664;</button><button data-dpad="ok" class="ok">OK</button><button data-dpad="right">&#9654;</button>
+  <span></span><button data-dpad="down">&#9660;</button><span></span>
 </div>
 
 <div class="grid">
   <button data-key="back">Back</button>
   <button data-key="home">Home</button>
   <button data-key="recents">Recents</button>
-  <button data-vol="down">Vol −</button>
+  <button data-vol="down">Vol &minus;</button>
   <button data-vol="mute">Mute</button>
   <button data-vol="up">Vol +</button>
 </div>
 
+<div class="label">Type</div>
 <div class="row">
   <input id="text" placeholder="Type here, then Send">
-  <button id="sendText">Send</button>
+  <button id="sendText" style="flex:0 0 auto;padding:13px 18px">Send</button>
 </div>
 
-<div class="row"><button id="mic">🎤 Speak</button></div>
+<div class="row"><button id="mic">Speak</button></div>
 <div id="heard"></div>
 
 <script>
@@ -62,37 +83,38 @@ let code = localStorage.getItem('tvRemoteCode') || '';
 $('#code').value = code;
 
 function setStatus(msg, ok) {
-  $('#status').textContent = msg;
-  $('#status').style.color = ok === undefined ? '#999' : ok ? '#7f7' : '#f88';
+  const el = $('#status');
+  el.textContent = msg;
+  el.className = ok === undefined ? '' : ok ? 'ok' : 'bad';
 }
 
 async function send(cmd) {
-  if (!code) { setStatus('Enter the pairing code shown on your TV', false); return false; }
+  if (!code) { setStatus('Enter the code from your TV', false); return false; }
   try {
     const r = await fetch('/api/cmd', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Pair-Code': code },
       body: JSON.stringify(cmd)
     });
-    if (r.status === 401) { setStatus('Wrong pairing code', false); return false; }
+    if (r.status === 401) { setStatus('Wrong code', false); return false; }
     const j = await r.json().catch(() => ({}));
-    if (!j.ok) { setStatus('TV could not do that. Is accessibility on, and is a text box focused for typing?', false); return false; }
+    if (!j.ok) { setStatus('TV could not do that. Is accessibility on?', false); return false; }
     setStatus('Connected', true);
     return true;
   } catch (e) {
-    setStatus('Cannot reach the TV. Same Wi-Fi?', false);
+    setStatus('Cannot reach TV. Same Wi-Fi?', false);
     return false;
   }
 }
 
 // Initial reachability check
-fetch('/api/status').then(r => r.json()).then(j => setStatus('Found TV: ' + j.name))
-  .catch(() => setStatus('Cannot reach the TV', false));
+fetch('/api/status').then(r => r.json()).then(j => setStatus(j.name || 'TV found', true))
+  .catch(() => setStatus('Cannot reach TV', false));
 
 $('#saveCode').onclick = () => {
   code = $('#code').value.trim();
   localStorage.setItem('tvRemoteCode', code);
-  setStatus('Code saved', undefined);
+  setStatus('Code saved', true);
 };
 
 // D-pad and OK
@@ -116,6 +138,7 @@ let sx = 0, sy = 0, st = 0, moved = 0;
 pad.addEventListener('touchstart', e => {
   const t = e.touches[0];
   sx = t.clientX; sy = t.clientY; st = Date.now(); moved = 0;
+  pad.classList.add('on');
   e.preventDefault();
 }, { passive: false });
 pad.addEventListener('touchmove', e => {
@@ -126,6 +149,7 @@ pad.addEventListener('touchmove', e => {
 pad.addEventListener('touchend', e => {
   const t = e.changedTouches[0];
   const dx = t.clientX - sx, dy = t.clientY - sy;
+  pad.classList.remove('on');
   if (moved < 10 && Date.now() - st < 400) {
     send({ type: 'tap' });
   } else if (Math.abs(dx) > Math.abs(dy)) {
@@ -159,7 +183,7 @@ if (!SR) {
     handleVoice(said);
   };
   rec.onerror = e => { $('#heard').textContent = 'Voice error: ' + e.error + ' (you can also use your keyboard mic)'; };
-  $('#mic').onclick = () => { $('#heard').textContent = 'Listening…'; rec.start(); };
+  $('#mic').onclick = () => { $('#heard').textContent = 'Listening...'; rec.start(); };
 }
 
 function handleVoice(s) {
